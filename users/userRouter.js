@@ -142,7 +142,7 @@ router.put("/:id", validateUserId, (req, res) => {
     });
 });
 
-//custom middleware
+//custom middleware - tested all of these and they're working
 
 function validateUserId(req, res, next) {
   Users.getById(req.params.id).then(user => {
