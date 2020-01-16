@@ -55,16 +55,14 @@ router.put("/:id", (req, res) => {
   const updateId = req.params.id;
   const { text } = req.body;
 
-  Posts.update(updateId, req.body)
+  Posts.update(updateId, validatePostId, req.body)
     .then(updated => {
       if (!text) {
         res.status(400).json({ errorMessage: "Please provide text" });
       } else if (!updatedId) {
-        res
-          .status(404)
-          .json({
-            errorMessage: "The post with the specified ID does not exist"
-          });
+        res.status(404).json({
+          errorMessage: "The post with the specified ID does not exist"
+        });
       } else {
         console.log(updated);
         res.status(200).json(updated);
@@ -76,7 +74,7 @@ router.put("/:id", (req, res) => {
         .status(500)
         .json({ error: "The post information could not be modified." });
     });
-  Posts.ById(updateId)
+  Posts.getById(updateId)
     .then(res.json(req.body))
     .catch(error => {
       console.log(error);
@@ -89,7 +87,14 @@ router.put("/:id", (req, res) => {
 // custom middleware
 
 function validatePostId(req, res, next) {
-  // do your magic!
+  Posts.getById(req.body.id).then(post => {
+    if (!post) {
+      res.status(404).json({ message: "invalid post id" });
+    } else {
+      res.status(201).json(req.body);
+    }
+  });
+  next();
 }
 
 module.exports = router;
